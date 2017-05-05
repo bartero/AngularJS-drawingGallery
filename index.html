@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html ng-app="gallery">
+<head>
+	<title>Function drawing gallery</title>
+	<meta charset="utf-8" />
+
+   <!-- Bootstrap - Latest compiled and minified JavaScript -->
+   <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script> -->
+
+   <script src="node_modules/angular/angular.js"></script>
+	<script src="node_modules/jquery/dist/jquery.js"></script>
+	<script src="app.js"></script>
+
+   <!-- Bootstrap - Latest compiled and minified CSS -->
+   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
+   <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<h1>
+		My function drawing gallery
+	</h1>
+	<div ng-controller="GalleryController">
+		<div>
+			<label for="drawingWidth">
+				Canvas width
+			</label>
+			<input id="drawingWidth"
+				ng-model="drawingWidth"
+				ng-model-options="{
+					updateOn: 'default blur',
+					debounce: { 'default': 1000, 'blur': 0 }
+				}"
+				min="50" max="600" step=10
+				type="number">
+			<label for="drawingHeight">
+				Canvas height
+			</label>
+			<input id="drawingHeight"
+				ng-model="drawingHeight"
+				ng-model-options="{
+					updateOn: 'default blur',
+					debounce: { 'default': 1000, 'blur': 0 }
+				}"
+				min="50" max="600" step=10
+				type="number">
+		</div>
+		<drawing
+			ng-repeat="color in colors"
+
+			drawing-width="drawingWidth"
+			drawing-height="drawingHeight"
+			drawing-function="drawingFunction.function"
+			drawing-params="{ color: color }"
+			/>
+	</div>
+</body>
+</html>
