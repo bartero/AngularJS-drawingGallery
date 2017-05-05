@@ -6,10 +6,8 @@ angular.module('gallery', [])
       $scope.drawingHeight = 300;
 
       $scope.drawingFunction = {
-         function: drawSquare,
-         defaultParams: {
-            color: [0,0,0]
-         }
+         start: drawSquare,
+         stop: undefined
       }
       $scope.colors = [];
       for(let i = 0; i < 9; i++) {
@@ -33,11 +31,15 @@ angular.module('gallery', [])
             let canvas = $element[0];//.getElementsByTagName('canvas')[0];
 
             let canvasSizeChanged = () => {
+               if($scope.drawingFunction.stop) {
+                  drawOnCanvas(canvas, $scope.drawingFunction.stop);
+               }
+
                canvas.width = $scope.drawingWidth;
                canvas.height = $scope.drawingHeight;
                console.log('drawingWidth: ' + $scope.drawingWidth + ', drawingHeight: ' + $scope.drawingHeight);
 
-               drawOnCanvas(canvas, $scope.drawingFunction, $scope.drawingParams);
+               drawOnCanvas(canvas, $scope.drawingFunction.start, $scope.drawingParams);
             }
             $scope.canvasSizeChanged = canvasSizeChanged;
             $scope.$watch('drawingWidth', function() {
