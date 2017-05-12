@@ -6,14 +6,15 @@ angular.module('gallery', [])
       $scope.drawingHeight = 300;
 
       $scope.drawingFunction = {
-         start: drawSquare,
-         stop: undefined
+         start: drawSquare
       }
       $scope.colors = [];
-      for(let i = 0; i < 9; i++) {
+      for(let i = 0; i < 3; i++) {
          let color = [randomInt(0, 255), randomInt(0, 255), randomInt(0, 255)];
          $scope.colors.push(color);
       }
+
+      $scope.drawSquare = drawSquare;
    })
    .directive('drawing', function() {
       return {
@@ -28,25 +29,24 @@ angular.module('gallery', [])
          },
 
          controller: function($scope, $element) {
-            let canvas = $element[0];//.getElementsByTagName('canvas')[0];
+            let canvas = $element[0];
 
-            let canvasSizeChanged = () => {
-               if($scope.drawingFunction.stop) {
-                  drawOnCanvas(canvas, $scope.drawingFunction.stop);
+            let start = $scope.drawingFunction.start;
+            let stop;
+
+            let notifySizeChanged = () => {
+               if(stop) {
+                  drawOnCanvas(canvas, stop);
                }
 
-               canvas.width = $scope.drawingWidth;
-               canvas.height = $scope.drawingHeight;
-               console.log('drawingWidth: ' + $scope.drawingWidth + ', drawingHeight: ' + $scope.drawingHeight);
-
-               drawOnCanvas(canvas, $scope.drawingFunction.start, $scope.drawingParams);
+               stop = drawOnCanvas(canvas, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingFunction.start, $scope.drawingParams);
             }
-            $scope.canvasSizeChanged = canvasSizeChanged;
+
             $scope.$watch('drawingWidth', function() {
-               canvasSizeChanged();
+               notifySizeChanged();
             });
             $scope.$watch('drawingHeight', function() {
-               canvasSizeChanged();
+               notifySizeChanged();
             });
          }
       };
@@ -57,13 +57,10 @@ function randomInt(min, max) {
    return min + Math.floor(Math.random() * (max - min));
 }
 
-
-function test(a, b, c) {
-   console.log('a: ' + a + ', b: ' + b +', c: ' + c);
-}
-
-function drawOnCanvas(canvas, f, drawingParams) {
-   var ctx = canvas.getContext("2d");
+function drawOnCanvas(canvas, width, height, f, drawingParams) {
+   let ctx = canvas.getContext("2d");
+   canvas.width = width;
+   canvas.height = height;
    f(ctx, canvas.width, canvas.height, drawingParams);
 }
 
