@@ -6,7 +6,8 @@ angular.module('gallery', [])
       $scope.drawingHeight = 300;
 
       $scope.drawingFunction = {
-         start: drawSquare
+         start: drawSquare,
+         prepareCanvas: true
       }
       $scope.colors = [];
       for(let i = 0; i < 3; i++) {
@@ -15,11 +16,10 @@ angular.module('gallery', [])
       }
 
       $scope.drawSquare = drawSquare;
+      $scope.drawFractal = drawFractal;
    })
    .directive('drawing', function() {
       return {
-         template: '<canvas></canvas>',
-         replace: true,
          restrict: 'E',
          scope: {
             drawingWidth: '=',
@@ -29,17 +29,30 @@ angular.module('gallery', [])
          },
 
          controller: function($scope, $element) {
-            let canvas = $element[0];
+            let parent = $element[0];
+            let preparedCanvas;
+            if($scope.drawingFunction.prepareCanvas) {
+               preparedCanvas = document.createElement('canvas');
+               parent.appendChild(preparedCanvas);
+            }
 
             let start = $scope.drawingFunction.start;
             let stop;
 
             let notifySizeChanged = () => {
                if(stop) {
-                  drawOnCanvas(canvas, stop);
+                  if(preparedCanvas) {
+                     drawOnCanvas(preparedCanvas, stop);
+                  } else {
+                     stop(parent);
+                  }
                }
 
-               stop = drawOnCanvas(canvas, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingFunction.start, $scope.drawingParams);
+               if(preparedCanvas) {
+                  stop = drawOnCanvas(preparedCanvas, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingFunction.start, $scope.drawingParams);
+               } else {
+                  stop = $scope.drawingFunction.start(parent, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingParams);
+               }
             }
 
             $scope.$watch('drawingWidth', function() {
@@ -83,4 +96,105 @@ function drawSquare(ctx, width, height, params) {
    x1 = Math.floor(((1 - ratio) / 4) * width);
    y1 = Math.floor(((1 - ratio) / 4) * height);
    ctx.fillRect(x1, y1, Math.floor(ratio * width / 2), Math.floor(ratio * height) / 2);
+}
+
+function drawFractal(parent, width, height) {
+   let stop;
+   let s = (p) => {
+      stop = () => {
+         p.remove();
+      }
+
+      var tree = [];
+      var x;
+      var y;
+
+      p.setup = function() {
+       p.createCanvas(width, height);
+
+       var a = p.createVector(p.width / 2, p.height);
+       var b = p.createVector(p.width / 2, p.height - 50);
+       var root = new Branch(a, b);
+       tree[0] = root;
+       for (var t = 0; t < 5; t++) {
+         for (var i = tree.length-1; i >= 0; i--) {
+           if (!tree[i].finished){
+             tree.push(tree[i].branchA());
+             tree.push(tree[i].branchB());
+             tree.push(tree[i].branchC());
+           }
+           tree[i].finished = true;
+         }
+       }
+     }
+
+     p.draw = function() {
+       p.background(51);
+       x = p.mouseX;
+       y = p.mouseY;
+
+       for (var i = 0; i < tree.length; i++) {
+         tree[i].show();
+         tree[i].wind(x, y, tree[i].end.x, tree[i].end.y);
+       }
+     }
+
+     function Branch(begin, end) {
+       this.begin = begin;
+       this.end   = end;
+       this.finished = false;
+       this.origx = this.end.x;
+       this.origy = this.end.y;
+
+       this.show = function() {
+         p.stroke(255);
+         p.line(this.begin.x, this.begin.y, this.end.x, this.end.y);
+       }
+
+       this.branchA = function() {
+         var dir = p5.Vector.sub(this.end, this.begin);
+         dir.rotate(19.2);
+         dir.mult(0.67);
+         var newEnd = p5.Vector.add(this.end, dir);
+
+         var v = new Branch(this.end, newEnd);
+         return v;
+       }
+       this.branchB = function() {
+         var dir = p5.Vector.sub(this.end, this.begin);
+         dir.rotate(0);
+         dir.mult(0.67);
+         var newEnd = p5.Vector.add(this.end, dir);
+
+         var v = new Branch(this.end, newEnd);
+         return v;
+       }
+       this.branchC = function() {
+         var dir = p5.Vector.sub(this.end, this.begin);
+         dir.rotate(-19.2);
+         dir.mult(0.67);
+         var newEnd = p5.Vector.add(this.end, dir);
+
+         var v = new Branch(this.end, newEnd);
+         return v;
+       }
+       this.wind = function(mox,moy,treex,treey) {
+             var d = p.dist(mox,moy,treex,treey);
+
+             if (d < 20) {
+               this.end.x += p.random(-0.3, 0.3);
+               this.end.y += p.random(-0.3, 0.3);
+             }else{
+
+               this.end.x = this.origx;
+               this.end.y = this.origy;
+
+             }
+         }
+     }
+   };
+
+   new p5(s, parent);
+
+   return stop;
 }

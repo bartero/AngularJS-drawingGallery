@@ -12,6 +12,7 @@
   "dependencies": {
      "angular": "^1.6",
      "bootstrap": "^3.3",
+     "p5": "^0.5"
   },
   "scripts": {
     "prestart": "npm install",

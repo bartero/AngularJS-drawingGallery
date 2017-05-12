@@ -5,6 +5,7 @@
 	<meta charset="utf-8" />
 
    <script src="node_modules/angular/angular.js"></script>
+	<script src="node_modules/p5/lib/p5.js"></script>
 	<script src="app.js"></script>
 
    <!-- Bootstrap - Latest compiled and minified CSS -->
@@ -18,7 +19,7 @@
 	<div ng-controller="GalleryController">
 		<div>
 			<label for="drawingWidth">
-				Canvas width
+				Drawing width
 			</label>
 			<input id="drawingWidth"
 				ng-model="drawingWidth"
@@ -29,7 +30,7 @@
 				min="50" max="600" step=10
 				type="number">
 			<label for="drawingHeight">
-				Canvas height
+				Drawing height
 			</label>
 			<input id="drawingHeight"
 				ng-model="drawingHeight"
@@ -46,8 +47,13 @@
 			drawing-width="drawingWidth"
 			drawing-height="drawingHeight"
 			drawing-function="drawingFunction"
-			drawing-params="{ color: color }"
-			/>
+			drawing-params="{ color: color }"></drawing>
+
+		<drawing
+			drawing-width="drawingWidth"
+			drawing-height="drawingHeight"
+			drawing-function="{ start: drawFractal, prepareCanvas: false }"
+			drawing-params="{ color: [23, 120, 150] }"></drawing>
 	</div>
 </body>
 </html>
