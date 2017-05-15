@@ -49,7 +49,12 @@ angular.module('gallery', [])
                }
 
                if(preparedCanvas) {
-                  stop = drawOnCanvas(preparedCanvas, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingFunction.start, $scope.drawingParams);
+                  let canvas = preparedCanvas;
+                  let ctx = canvas.getContext("2d");
+
+                  canvas.width = $scope.drawingWidth;
+                  canvas.height = $scope.drawingHeight;
+                  stop = $scope.drawingFunction.start(ctx, canvas.width, canvas.height, $scope.drawingParams);
                } else {
                   stop = $scope.drawingFunction.start(parent, $scope.drawingWidth, $scope.drawingHeight, $scope.drawingParams);
                }
@@ -68,13 +73,6 @@ angular.module('gallery', [])
 
 function randomInt(min, max) {
    return min + Math.floor(Math.random() * (max - min));
-}
-
-function drawOnCanvas(canvas, width, height, f, drawingParams) {
-   let ctx = canvas.getContext("2d");
-   canvas.width = width;
-   canvas.height = height;
-   f(ctx, canvas.width, canvas.height, drawingParams);
 }
 
 function drawSquare(ctx, width, height, params) {
