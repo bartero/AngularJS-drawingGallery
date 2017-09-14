@@ -16,7 +16,7 @@ for(let i = 0; i < 0; i++) {
 }
 ```
 
-```js
+```java
 $scope.colors = [];
 for(let i = 0; i < 0; i++) {
    let color = [randomInt(0, 255), randomInt(0, 255), randomInt(0, 255)];
